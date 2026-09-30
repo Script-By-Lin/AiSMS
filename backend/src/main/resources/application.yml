@@ -1,0 +1,77 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: sms-app
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sms_db}
+    username: ${DB_USERNAME:bit}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+      idle-timeout: 30000
+      connection-timeout: 20000
+      max-lifetime: 1800000
+      leak-detection-threshold: 20000
+      pool-name: SMS-HikariCP-Pool
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        default_batch_fetch_size: 50
+        in_clause_parameter_padding: true
+        generate_statistics: false
+        session:
+          events:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 100
+    open-in-view: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      repositories:
+        enabled: false
+
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 # 10 minutes default
+      cache-null-values: false
+
+app:
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration-ms: 86400000 # 24 hours
+    refresh-expiration-ms: 604800000 # 7 days
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+    allowed-headers: "*"
+  gemini:
+    api-key: ${GEMINI_API_KEY:YOUR_GEMINI_API_KEY}
+    api-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent
+    model: gemini-3.8-flash
+  rate-limiting:
+    enabled: true
+    limit-per-minute: 120
+
+logging:
+  level:
+    root: INFO
+    com.sms.app: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
